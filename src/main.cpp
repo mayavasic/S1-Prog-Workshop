@@ -299,3 +299,14 @@ int main()
     image.save("output/pouet.png");
 }
 
+
+
+
+
+
+
+/* rappel pour push sur mon github
+git add .
+git commit -m "MAJ"
+git push
+*/
