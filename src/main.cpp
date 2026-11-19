@@ -5,6 +5,7 @@
 #include <string>
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 
 // exo vert
@@ -478,16 +479,227 @@ void tri_random_pixel(sil::Image& image)
 
 
 
-int main()
+/*degradé couleur*/
+void degrade_couleur(sil::Image& image)
 {
-    sil::Image image{"images/logo.png"};
-    tri_random_pixel(image);
-    image.save("output/pouet.png"); 
+    glm::vec3 color1{1.f, 0.f, 1.f}; 
+    glm::vec3 color2{0.f, 1.f, 0.f}; 
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            float t = static_cast<float>(x) / (image.width() - 1);
+            image.pixel(x, y) = glm::mix(color1, color2, t);
+        }
+    }
 }
 
 
 
-/* rappel pour push sur mon github
+
+
+/*netteté*/
+
+/* convolution */
+void apply_kernel(sil::Image& image, std::vector<std::vector<float>> const& kernel)
+{
+    sil::Image original = image;
+    int width = image.width();
+    int height = image.height();
+
+    for (int x{0}; x < width; x++)
+    {
+        for (int y{0}; y < height; y++)
+        {
+            glm::vec3 final_color{0.f};
+
+            for (int dx{-1}; dx <= 1; dx++)
+            {
+                for (int dy{-1}; dy <= 1; dy++)
+                {
+                    int next_x = std::clamp(x + dx, 0, width - 1);
+                    int next_y = std::clamp(y + dy, 0, height - 1);
+
+                    float weight = kernel[dx + 1][dy + 1];
+                    final_color += original.pixel(next_x, next_y) * weight;
+                }
+            }
+
+            image.pixel(x, y) = final_color;
+        }
+    }
+}
+
+/* sharpen*/
+void sharpen(sil::Image& image)
+{
+    std::vector<std::vector<float>> kernel = {
+        { 0.f, -1.f,  0.f},
+        {-1.f,  5.f, -1.f},
+        { 0.f, -1.f,  0.f}
+    };
+    apply_kernel(image, kernel);
+}
+
+
+/* outline*/
+void outline(sil::Image& image)
+{
+    std::vector<std::vector<float>> kernel = {
+        {-1.f, -1.f, -1.f},
+        {-1.f,  8.f, -1.f},
+        {-1.f, -1.f, -1.f}
+    };
+    apply_kernel(image, kernel);
+}
+
+
+
+
+
+/* blur naif et sépare*/
+
+void blur_naif(sil::Image& image, int blur_size)
+{
+    sil::Image original = image;
+    int width = image.width();
+    int height = image.height();
+
+    for (int x{0}; x < width; x++)
+    {
+        for (int y{0}; y < height; y++)
+        {
+            glm::vec3 sum{0.f};
+            int count = 0;
+
+            for (int dx{-blur_size}; dx <= blur_size; dx++)
+            {
+                for (int dy{-blur_size}; dy <= blur_size; dy++)
+                {
+                    int next_x = std::clamp(x + dx, 0, width - 1);
+                    int next_y = std::clamp(y + dy, 0, height - 1);
+                    sum += original.pixel(next_x, next_y);
+                    count++;
+                }
+            }
+            image.pixel(x, y) = sum / static_cast<float>(count);
+        }
+    }
+}
+
+void blur_horizontal(sil::Image& image, int blur_size)
+{
+    sil::Image original = image;
+    int width = image.width();
+    int height = image.height();
+
+    for (int x{0}; x < width; x++)
+    {
+        for (int y{0}; y < height; y++)
+        {
+            glm::vec3 sum{0.f};
+            int count = 0;
+
+            for (int dx{-blur_size}; dx <= blur_size; dx++)
+            {
+                int next_x = std::clamp(x + dx, 0, width - 1);
+                sum += original.pixel(next_x, y);
+                count++;
+            }
+            image.pixel(x, y) = sum / static_cast<float>(count);
+        }
+    }
+}
+
+
+void blur_vertical(sil::Image& image, int blur_size)
+{
+    sil::Image original = image;
+    int width = image.width();
+    int height = image.height();
+
+    for (int x{0}; x < width; x++)
+    {
+        for (int y{0}; y < height; y++)
+        {
+            glm::vec3 sum{0.f};
+            int count = 0;
+
+            for (int dy{-blur_size}; dy <= blur_size; dy++)
+            {
+                int neighbor_y = std::clamp(y + dy, 0, height - 1);
+                sum += original.pixel(x, neighbor_y);
+                count++;
+            }
+            image.pixel(x, y) = sum / static_cast<float>(count);
+        }
+    }
+}
+
+
+void separe_blur(sil::Image& image, int blur_size)
+{
+    blur_horizontal(image, blur_size);
+    blur_vertical(image, blur_size);
+}
+
+
+
+
+
+
+
+/* différence gaussienne*/
+
+void diff_gauss(sil::Image& image)
+{
+    sil::Image img1 = image;
+    sil::Image img2 = image;
+
+   
+    separe_blur(img1, 1);
+    separe_blur(img2, 5);
+
+  
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            glm::vec3 diff = img1.pixel(x, y) - img2.pixel(x, y);
+            float brightness = (diff.r + diff.g + diff.b) / 3.f;
+
+           
+            if (brightness > 0.025f)
+            {
+                image.pixel(x, y) = glm::vec3{0.f};
+            }
+            else
+            {
+               
+                image.pixel(x, y) = glm::vec3{1.f}; 
+            }
+        }
+    }
+}
+
+
+
+
+
+int main()
+{
+    sil::Image image{"images/photo.jpg"};
+    diff_gauss(image);
+    image.save("output/pouet.png");
+}
+
+
+
+
+
+
+/* rappel pour push  github ou direct sur vscode
 git add .
 git commit -m "MAJ"
 git push
