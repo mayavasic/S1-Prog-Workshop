@@ -4,6 +4,7 @@
 #include <sil/sil.hpp>
 #include <string>
 #include <cmath>
+#include <algorithm>
 
 
 // exo vert
@@ -414,15 +415,75 @@ void glitch(sil::Image& image)
     }
 }
 
-int main()
+
+
+
+/* tri de pixels*/
+/*trier tous les pixels*/
+
+
+float brightness(glm::vec3 const& color)
 {
-    sil::Image image{"images/logo.png"};
-    glitch(image);
-    image.save("output/pouet.png"); 
+    return (color.r + color.g + color.b) / 3.f;
+}
+
+void tri_all_pixel(sil::Image& image)
+{
+    std::sort(image.pixels().begin(), image.pixels().end(), [](glm::vec3 const& color1, glm::vec3 const& color2) {
+        return brightness(color1) < brightness(color2);
+    });
+}
+
+
+/*trier lignes*/
+
+void tri_ligne_pixel(sil::Image& image)
+{
+    for (int y{0}; y < image.height(); y++)
+    {
+        auto rang_start = image.pixels().begin() + y * image.width();
+        auto rang_end = rang_start + image.width();
+
+        std::sort(rang_start, rang_end, [](glm::vec3 const& color1, glm::vec3 const& color2) {
+            return brightness(color1) < brightness(color2);
+        });
+    }
 }
 
 
 
+/*trier parties aléatoires*/
+
+void tri_random_pixel(sil::Image& image)
+{
+    int const nb_parties = 400;
+
+    for (int i{0}; i < nb_parties; i++)
+    {
+        int y = random_int(0, image.height() - 1);
+        int x1 = random_int(0, image.width() - 1);
+        int x2 = random_int(0, image.width() - 1);
+
+        if (x1 > x2)
+        {
+            std::swap(x1, x2);
+        }
+
+        auto rang_start = image.pixels().begin() + y * image.width();
+        std::sort(rang_start + x1, rang_start + x2, [](glm::vec3 const& color1, glm::vec3 const& color2) {
+            return brightness(color1) < brightness(color2);
+        });
+    }
+}
+
+
+
+int main()
+{
+    sil::Image image{"images/logo.png"};
+    tri_random_pixel(image);
+    image.save("output/pouet.png"); 
+}
 
 
 
