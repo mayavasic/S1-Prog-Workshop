@@ -3,6 +3,8 @@
 #include "random.hpp"
 #include <sil/sil.hpp>
 #include <string>
+#include <cmath>
+
 
 // exo vert
 void vert_only(sil::Image& image)
@@ -288,17 +290,136 @@ int main()
 
 // Rosace (indice trigo)
 
+void rosace(sil::Image& image)
+{
+    glm::vec2 center{image.width() / 2.f, image.height() / 2.f};
+    float radius = 100.f;
+    float thickness = 5.f;
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            glm::vec2 pos{x, y};
+            
+/* faire cercle autour du centre*/
+            for (int i{0}; i < 6; i++)
+            {
+                float angle = i * 2.f * M_PI / 6.f;
+                glm::vec2 circle_center = center + radius * glm::vec2{std::cos(angle), std::sin(angle)};
+                
+                float distance = glm::distance(pos, circle_center);
+                if (distance <= radius && distance >= radius - thickness)
+                {
+                    image.pixel(x, y) = glm::vec3{1.f};
+                }
+            }
+        }
+    }
+}
+
+
+/*mosaique*/
+void mosaique(sil::Image& image)
+{
+    sil::Image original = image; 
+    int width = image.width();
+    int height = image.height();
+
+    for (int x{0}; x < width; x++)
+    {
+        for (int y{0}; y < height; y++)
+        {
+            int original_x = (x * 6) % width;
+            int original_y = (y * 6) % height;
+
+            image.pixel(x, y) = original.pixel(original_x, original_y);
+        }
+    }
+}
+
+
+/* bien changer l'image noire pour logo
+int main()
+{
+    sil::Image image{"images/logo.png"};
+    mosaique(image);
+    image.save("output/pouet.png"); 
+}
+    */
 
 
 
+
+/* meme chose mais inverser une image sur 2*/
+void mosaique_inverse(sil::Image& image)
+{
+    sil::Image original = image;
+    int width = image.width();
+    int height = image.height();
+
+    for (int x{0}; x < width; x++)
+    {
+        for (int y{0}; y < height; y++)
+        {
+            int tile_x = (x * 3) / width;
+            int tile_y = (y * 3) / height;
+            int original_x = (x * 3) % width;
+            int original_y = (y * 3) % height;
+
+        /*si impair sur abscisses alors => inverse pareil pour oordonnées
+            */
+            if (tile_x % 2 == 1)
+            {
+                original_x = width - 1 - original_x;
+            }
+            if (tile_y % 2 == 1)
+            {
+                original_y = height - 1 - original_y;
+            }
+            image.pixel(x, y) = original.pixel(original_x, original_y);
+        }
+    }
+}
+
+
+
+
+
+/*glitch*/
+#include <sil/sil.hpp>
+#include "random.hpp"
+
+void glitch(sil::Image& image)
+{
+    int const nb_glitches = 50; // Nombre de rectangles à échanger
+
+    for (int i{0}; i < nb_glitches; i++)
+    {
+        
+        int rect_width = random_int(10, 50);
+        int rect_height = random_int(2, 8);
+
+        int x1 = random_int(0, image.width() - rect_width);
+        int y1 = random_int(0, image.height() - rect_height);
+        int x2 = random_int(0, image.width() - rect_width);
+        int y2 = random_int(0, image.height() - rect_height);
+        for (int x{0}; x < rect_width; x++)
+        {
+            for (int y{0}; y < rect_height; y++)
+            {
+                std::swap(image.pixel(x1 + x, y1 + y), image.pixel(x2 + x, y2 + y));
+            }
+        }
+    }
+}
 
 int main()
 {
-    sil::Image image{500, 500};
-    disque(image);
-    image.save("output/pouet.png");
+    sil::Image image{"images/logo.png"};
+    glitch(image);
+    image.save("output/pouet.png"); 
 }
-
 
 
 
