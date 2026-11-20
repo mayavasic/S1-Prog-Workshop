@@ -130,11 +130,11 @@
 		},
 		{
 			"backtrace" : 2,
-			"id" : "img::@9728505c1cf5ff17dbeb"
+			"id" : "stb_image::@9728505c1cf5ff17dbeb"
 		},
 		{
 			"backtrace" : 2,
-			"id" : "stb_image::@9728505c1cf5ff17dbeb"
+			"id" : "img::@9728505c1cf5ff17dbeb"
 		}
 	],
 	"id" : "ImageEditor::@6890427a1f51a3e7e1df",
