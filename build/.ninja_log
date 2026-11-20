@@ -1,13 +1,18 @@
 # ninja log v7
-7	95	8168753173571831	C:/Users/Maya/Downloads/S1-Prog-Workshop-main/S1-Prog-Workshop-main/build/CMakeFiles/cmake.verify_globs	ba127aa738e993b
+9	115	8168869509113648	C:/Users/Maya/Downloads/S1-Prog-Workshop-main/S1-Prog-Workshop-main/build/CMakeFiles/cmake.verify_globs	ba127aa738e993b
 123	1381	8165228001243073	lib/sil/lib/img/CMakeFiles/stb_image.dir/lib/stb_image/stb_image_write.cpp.obj	8c86c0912f6a6b58
 181	2111	8165228001797967	CMakeFiles/ImageEditor.dir/lib/random.cpp.obj	4fa30185b3c3b246
 109	2731	8165228001097264	lib/sil/lib/img/CMakeFiles/stb_image.dir/lib/stb_image/stb_image.cpp.obj	c456a0f7ab810314
 137	2794	8165228001394144	lib/sil/lib/img/CMakeFiles/img.dir/src/Load.cpp.obj	92ee9fb9cea544f5
 151	3041	8165228001528253	lib/sil/lib/img/CMakeFiles/img.dir/src/Save.cpp.obj	35e21099d6768fcb
-113	3787	8168753174631518	CMakeFiles/ImageEditor.dir/src/main.cpp.obj	9f02f48100a60454
+133	4034	8168869510406081	CMakeFiles/ImageEditor.dir/src/main.cpp.obj	9f02f48100a60454
 2731	3329	8165228027327418	lib/sil/lib/img/libstb_image.a	ba882aebd5098db9
 3329	3763	8165228033285289	lib/sil/lib/img/libimg.a	4bf27a2a47d397e8
 166	4051	8165228001672753	lib/sil/CMakeFiles/sil.dir/src/sil.cpp.obj	8d60502d35d3c877
 4051	4467	8165228040471099	lib/sil/libsil.a	e94c49bcf68ab400
-3787	4298	8168753211401509	ImageEditor.exe	881f08daf4aba87e
+4035	4837	8168869549433275	ImageEditor.exe	881f08daf4aba87e
+8	90	8168870267134622	C:/Users/Maya/Downloads/S1-Prog-Workshop-main/S1-Prog-Workshop-main/build/CMakeFiles/cmake.verify_globs	ba127aa738e993b
+5	67	8168870532435061	C:/Users/Maya/Downloads/S1-Prog-Workshop-main/S1-Prog-Workshop-main/build/CMakeFiles/cmake.verify_globs	ba127aa738e993b
+6	86	8168871958895449	C:/Users/Maya/Downloads/S1-Prog-Workshop-main/S1-Prog-Workshop-main/build/CMakeFiles/cmake.verify_globs	ba127aa738e993b
+99	3651	8168871959802397	CMakeFiles/ImageEditor.dir/src/main.cpp.obj	9f02f48100a60454
+3652	4179	8168871995333191	ImageEditor.exe	881f08daf4aba87e
