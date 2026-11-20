@@ -216,15 +216,6 @@ void disque(sil::Image& image)
     }
 }
 
-/* pour mettr eimage noire en fond 
-
-int main()
-{
-    sil::Image image{500, 500};
-    disque(image);
-    image.save("output/pouet.png");
-}*/
-
 
 
 //cercle
@@ -276,21 +267,12 @@ void animation(sil::Image& image)
     }
 }
 
-/* output pour animation
-
-int main()
-{
-    sil::Image image{500, 500};
-    animation(image);
-}
-
-*/
 
 
 
 
 
-// Rosace (indice trigo)
+// Rosace 
 
 void rosace(sil::Image& image)
 {
@@ -353,7 +335,6 @@ int main()
 
 
 
-/* meme chose mais inverser une image sur 2*/
 void mosaique_inverse(sil::Image& image)
 {
     sil::Image original = image;
@@ -394,8 +375,7 @@ void mosaique_inverse(sil::Image& image)
 
 void glitch(sil::Image& image)
 {
-    int const nb_glitches = 50; // Nombre de rectangles à échanger
-
+    int const nb_glitches = 50; 
     for (int i{0}; i < nb_glitches; i++)
     {
         
@@ -685,6 +665,42 @@ void diff_gauss(sil::Image& image)
 
 
 
+/* différence gaussienne inversé*/
+
+void diff_gauss_inverse(sil::Image& image)
+{
+    sil::Image img1 = image;
+    sil::Image img2 = image;
+
+   
+    separe_blur(img1, 1);
+    separe_blur(img2, 5);
+
+  
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            glm::vec3 diff = img1.pixel(x, y) - img2.pixel(x, y);
+            float brightness = (diff.r + diff.g + diff.b) / 3.f;
+
+           
+            if (brightness > 0.025f)
+            {
+                image.pixel(x, y) = glm::vec3{1.f};
+            }
+            else
+            {
+               
+                image.pixel(x, y) = glm::vec3{0.f}; 
+            }
+        }
+    }
+}
+
+
+
+
 /*height map*/
 
 void height_map(sil::Image& image)
@@ -711,7 +727,81 @@ void height_map(sil::Image& image)
     }
 }
 
-/*retro*/
+
+
+//tramage
+void tramage(sil::Image& image)
+{
+    float bayer4[4][4] = {
+        { 0.f/16.f,  8.f/16.f,  2.f/16.f, 10.f/16.f},
+        {12.f/16.f,  4.f/16.f, 14.f/16.f,  6.f/16.f},
+        { 3.f/16.f, 11.f/16.f,  1.f/16.f,  9.f/16.f},
+        {15.f/16.f,  7.f/16.f, 13.f/16.f,  5.f/16.f}
+    };
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            glm::vec3& color = image.pixel(x, y);
+            
+            
+            float brightness = (color.r + color.g + color.b) / 3.f;
+            float threshold = bayer4[x % 4][y % 4];
+            if (brightness < threshold)
+            {
+                color = glm::vec3{0.f};
+            }
+            else
+            {
+                color = glm::vec3{1.f};
+            }
+        }
+    }
+}
+
+
+
+/*tramage inversé*/
+void tramage_inverted(sil::Image& image)
+{
+    float bayer4[4][4] = {
+        { 0.f/16.f,  8.f/16.f,  2.f/16.f, 10.f/16.f},
+        {12.f/16.f,  4.f/16.f, 14.f/16.f,  6.f/16.f},
+        { 3.f/16.f, 11.f/16.f,  1.f/16.f,  9.f/16.f},
+        {15.f/16.f,  7.f/16.f, 13.f/16.f,  5.f/16.f}
+    };
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            glm::vec3& color = image.pixel(x, y);
+            
+            
+            float brightness = (color.r + color.g + color.b) / 3.f;
+            float threshold = bayer4[x % 4][y % 4];
+            if (brightness < threshold)
+            {
+                color = glm::vec3{1.f};
+            }
+            else
+            {
+                color = glm::vec3{0.f};
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+/*retro effet perso */
 void retro(sil::Image& image)
 {
     int width = image.width();
@@ -721,29 +811,259 @@ void retro(sil::Image& image)
     {
         for (int y{0}; y < height; y++)
         {
-            // Assombrit une ligne sur deux pour donner un effet de balayage TV
             if (y % 4 == 0)
             {
-                image.pixel(x, y) *= 0.6f; // Réduit la luminosité de 40%
+                image.pixel(x, y) *= 0.6f;
             }
         }
     }
 }
 
+
+
+
+
+
+
+
+
+
+
 int main()
 {
+    // exo vert
+    {
+        sil::Image image{"images/logo.png"};
+        vert_only(image);
+        image.save("output/vert.png");
+    }
+
+    // Échanger les couleurs 
+    {
+        sil::Image image{"images/logo.png"};
+        color_swap(image);
+        image.save("output/color_swap.png");
+    }
+
+    // Exo noir et blanc
+    {
+        sil::Image image{"images/logo.png"};
+        noir_blanc(image);
+        image.save("output/noir_blanc.png");
+    }
+
+    // Exercice négatif
+    {
+        sil::Image image{"images/logo.png"};
+        negatif(image);
+        image.save("output/negatif.png");
+    }
+
+    // Exo dégradé
+    {
+        sil::Image image{500, 500};
+        degrade(image);
+        image.save("output/degrade.png");
+    }
+
+    // Exo miroir
+    {
+        sil::Image image{"images/logo.png"};
+        mirroir(image);
+        image.save("output/mirroir.png");
+    }
+
+    // exo bruit
+    {
+        sil::Image image{"images/logo.png"};
+        bruit(image);
+        image.save("output/bruit.png");
+    }
+
+    // rotation 90
+    {
+        sil::Image image{"images/photo.jpg"};
+        rotation_90(image);
+        image.save("output/rotation_90.png");
+    }
+
+    // RGB split
+    {
+        sil::Image image{"images/logo.png"};
+        rgb_split(image);
+        image.save("output/rgb_split.png");
+    }
+
+    // exo luminosité et assombrissement
+    {
+        sil::Image image{"images/photo.jpg"};
+        luminosity(image);
+        image.save("output/luminosity.png");
+    }
+    {
+        sil::Image image{"images/photo.jpg"};
+        obscur(image);
+        image.save("output/obscur.png");
+    }
+
+    //exo dissqque 
+    {
+        sil::Image image{500, 500};
+        disque(image);
+        image.save("output/disque.png");
+    }
+
+    //cercle
+    {
+        sil::Image image{500, 500};
+        cercle(image);
+        image.save("output/cercle.png");
+    }
+
+    //animation
+    {
+        sil::Image image{500, 500};
+        animation(image);
+    }
+
+    // Rosace (indice trigo)
+    {
+        sil::Image image{500, 500};
+        rosace(image);
+        image.save("output/rosace.png");
+    }
+
+    /*mosaique*/
+    {
+        sil::Image image{"images/logo.png"};
+        mosaique(image);
+        image.save("output/mosaique.png");
+    }
+
+    /* mosaique meme chose mais inverser une image sur 2*/
+    {
+        sil::Image image{"images/logo.png"};
+        mosaique_inverse(image);
+        image.save("output/mosaique_inverse.png");
+    }
+
+    /*glitch*/
+    {
+        sil::Image image{"images/logo.png"};
+        glitch(image);
+        image.save("output/glitch.png");
+    }
+
+    /* tri de pixels*/
+    /*trier tous les pixels*/
+    {
+        sil::Image image{"images/logo.png"};
+        tri_all_pixel(image);
+        image.save("output/tri_all_pixel.png");
+    }
+
+    /*trier lignes*/
+    {
+        sil::Image image{"images/logo.png"};
+        tri_ligne_pixel(image);
+        image.save("output/tri_ligne_pixel.png");
+    }
+
+    /*trier parties aléatoires*/
+    {
+        sil::Image image{"images/logo.png"};
+        tri_random_pixel(image);
+        image.save("output/tri_random_pixel.png");
+    }
+
+    /*degradé couleur*/
+    {
+        sil::Image image{500, 500};
+        degrade_couleur(image);
+        image.save("output/degrade_couleur.png");
+    }
+
+    /* sharpen*/
+    {
+        sil::Image image{"images/photo.jpg"};
+        sharpen(image);
+        image.save("output/sharpen.png");
+    }
+
+    /* outline*/
+    {
+        sil::Image image{"images/photo.jpg"};
+        outline(image);
+        image.save("output/outline.png");
+    }
+
+    /* blur naif et sépare*/
+    {
+        sil::Image image{"images/logo.png"};
+        separe_blur(image, 50);
+        image.save("output/blur_separe.png");
+    }
+    {
+        sil::Image image{"images/logo.png"};
+        blur_naif(image, 50);
+        image.save("output/blur_naif.png");
+    }
+    {
+        sil::Image image{"images/logo.png"};
+        blur_horizontal(image, 10);
+        image.save("output/blur_horizontal.png");
+    }
+    {
+        sil::Image image{"images/logo.png"};
+        blur_vertical(image, 10);
+        image.save("output/blur_vertical.png");
+    }
+
+    /* différence gaussienne*/
+    {
+        sil::Image image{"images/photo.jpg"};
+        diff_gauss(image);
+        image.save("output/diff_gauss.png");
+    }
+
+    /* différence gaussienne inversée*/
+    {
+        sil::Image image{"images/photo.jpg"};
+        diff_gauss_inverse(image);
+        image.save("output/diff_gauss_inverse.png");
+    }
+
+
+    /*height map*/
+    {
+        sil::Image image{"images/map_black_white.png"};
+        height_map(image);
+        image.save("output/height_map.png");
+    }
+
+    /*retro*/
+    {
+        sil::Image image{"images/photo.jpg"};
+        retro(image);
+        image.save("output/retro.png");
+    }
+
+
+
+
+     /*tramage*/
+    {
     sil::Image image{"images/photo.jpg"};
-    retro(image);
-    image.save("output/pouet.png");
+    tramage(image);
+    image.save("output/tramage.png");
+    }
+
+
+    /*tramage inversé*/
+    {
+    sil::Image image{"images/photo.jpg"};
+    tramage_inverted(image);
+    image.save("output/tramage_inverted.png");
+    }
 }
 
-
-
-
-
-
-/* rappel pour push  github ou direct sur vscode
-git add .
-git commit -m "MAJ"
-git push
-*/
