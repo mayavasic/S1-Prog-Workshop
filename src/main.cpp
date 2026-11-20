@@ -685,12 +685,55 @@ void diff_gauss(sil::Image& image)
 
 
 
+/*height map*/
 
+void height_map(sil::Image& image)
+{
+    glm::vec3 dark_blue{0.f, 0.f, 0.3f};
+    glm::vec3 light_blue{0.2f, 0.6f, 1.f};
+    glm::vec3 green{0.2f, 0.7f, 0.2f};
+    glm::vec3 brown{0.4f, 0.2f, 0.1f};
+
+    for (glm::vec3& color : image.pixels())
+    {
+        float height = color.r;
+
+        if (height < 0.5f)
+        {
+            float t = height / 0.5f;
+            color = glm::mix(dark_blue, light_blue, t);
+        }
+        else
+        {
+            float t = (height - 0.5f) / 0.5f;
+            color = glm::mix(green, brown, t);
+        }
+    }
+}
+
+/*retro*/
+void retro(sil::Image& image)
+{
+    int width = image.width();
+    int height = image.height();
+
+    for (int x{0}; x < width; x++)
+    {
+        for (int y{0}; y < height; y++)
+        {
+            // Assombrit une ligne sur deux pour donner un effet de balayage TV
+            if (y % 4 == 0)
+            {
+                image.pixel(x, y) *= 0.6f; // Réduit la luminosité de 40%
+            }
+        }
+    }
+}
 
 int main()
 {
     sil::Image image{"images/photo.jpg"};
-    diff_gauss(image);
+    retro(image);
     image.save("output/pouet.png");
 }
 
